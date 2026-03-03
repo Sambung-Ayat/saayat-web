@@ -13,7 +13,7 @@ export async function GET(request: Request) {
   if (code) {
     const supabase = await createClient()
     const { error, data: { user: supabaseUser } } = await supabase.auth.exchangeCodeForSession(code)
-    
+
     if (!error && supabaseUser) {
       // Logic to merge guest data
       const cookieStore = await cookies()
@@ -88,34 +88,38 @@ export async function GET(request: Request) {
           cookieStore.delete(GUEST_COOKIE)
         }
       } else {
-         // No guest ID, ensure DB user exists for logged in user
-          const dbUser = await prisma.user.findUnique({
-            where: { id: supabaseUser.id }
+        // No guest ID, ensure DB user exists for logged in user
+        const dbUser = await prisma.user.findUnique({
+          where: { id: supabaseUser.id }
+        })
+
+        if (!dbUser) {
+          await prisma.user.create({
+            data: {
+              id: supabaseUser.id,
+              email: supabaseUser.email,
+              provider: 'google',
+              displayName: supabaseUser.user_metadata.full_name || supabaseUser.user_metadata.name || 'Hamba Allah',
+              isGuest: false,
+            }
           })
-          
-          if (!dbUser) {
-             await prisma.user.create({
-                data: {
-                  id: supabaseUser.id,
-                  email: supabaseUser.email,
-                  provider: 'google',
-                  displayName: supabaseUser.user_metadata.full_name || supabaseUser.user_metadata.name || 'Hamba Allah',
-                  isGuest: false,
-                }
-             })
-          } else if (!dbUser.displayName) {
-             // Update display name if missing for existing user
-             await prisma.user.update({
-                where: { id: dbUser.id },
-                data: {
-                   displayName: supabaseUser.user_metadata.full_name || supabaseUser.user_metadata.name || 'Hamba Allah'
-                }
-             })
-          }
+        } else if (!dbUser.displayName) {
+          // Update display name if missing for existing user
+          await prisma.user.update({
+            where: { id: dbUser.id },
+            data: {
+              displayName: supabaseUser.user_metadata.full_name || supabaseUser.user_metadata.name || 'Hamba Allah'
+            }
+          })
+        }
       }
     }
   }
 
   // Redirect to original page
-  return NextResponse.redirect(new URL(next, origin))
+  return NextResponse.redirect(
+    new URL(
+      process.env.NEXT_PUBLIC_SITE_URL || "https://saayat.site"
+    )
+  )
 }
