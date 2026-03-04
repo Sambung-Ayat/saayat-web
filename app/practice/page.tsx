@@ -301,7 +301,7 @@ function PracticeContent() {
         <main className="w-full max-w-xl flex flex-col items-center space-y-6 sm:space-y-12 pb-20 px-4 my-auto">
           <div className={`text-center space-y-4 sm:space-y-6 w-full transition-opacity duration-500 ${!question ? 'opacity-0' : 'opacity-100'}`}>
             <div className="flex justify-between items-center w-full max-w-xs mx-auto text-[10px] md:text-xs font-bold text-muted-foreground uppercase tracking-widest bg-muted/30 px-4 py-2 rounded-full">
-              <span>{t.question} {Math.max(1, (sessionLimit + 1) - remainingQuestions)} / {sessionLimit}</span>
+              <span>{t.question} {isSubmitted ? (sessionLimit - remainingQuestions) : (sessionLimit - remainingQuestions + 1)} / {sessionLimit}</span>
               <span className="text-primary">{totalPoints} {t.pts}</span>
             </div>
 
