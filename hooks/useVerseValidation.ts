@@ -60,6 +60,7 @@ export function useVerseValidation(
         setCombo(data.comboStreak ?? 0);
         setPointsGained(data.pointsGained ?? 0);
         setMaxCombo((prev) => Math.max(prev, data.comboStreak ?? 0));
+        setMaxStreak((prev) => Math.max(prev, data.currentCorrectStreak ?? 0));
         playSound("correct");
       } else {
         setStreak(0);
