@@ -271,7 +271,9 @@ export default function Home() {
   const fetchSurahs = async (juzs: number[]) => {
     setLoadingSurahs(true);
     try {
-      const res = await fetch(`/api/quiz/surahs?juz=${juzs.join(",")}`);
+      const res = await fetch(`/api/quiz/surahs?juz=${juzs.join(",")}`, {
+        credentials: "include",
+      });
       if (res.ok) {
         const { data } = await res.json();
         setSurahs(data);
