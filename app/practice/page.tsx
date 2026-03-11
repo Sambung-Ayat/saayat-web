@@ -140,7 +140,7 @@ function PracticeContent() {
     setActiveDragItem(null);
 
     try {
-      let url = "/api/quiz/question";
+      let url = `${process.env.NEXT_PUBLIC_API_URL}/quiz/question`;
       const params = new URLSearchParams();
       if (juzParam) params.append("juz", juzParam);
       if (surahParam) params.append("surah", surahParam);

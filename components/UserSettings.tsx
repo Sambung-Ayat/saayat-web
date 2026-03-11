@@ -22,7 +22,7 @@ export default function UserSettings({ user, onClose }: UserSettingsProps) {
   useEffect(() => {
     const run = async () => {
       try {
-        const res = await fetch("/api/user/me", {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/user/me`, {
           credentials: "include",
         });
 
@@ -50,7 +50,7 @@ export default function UserSettings({ user, onClose }: UserSettingsProps) {
 
     setIsLoading(true);
     try {
-      const res = await fetch("/api/user/me", {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/user/me`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -86,7 +86,7 @@ export default function UserSettings({ user, onClose }: UserSettingsProps) {
 
     setIsLoading(true);
     try {
-      const res = await fetch("/api/user/me", {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/user/me`, {
         method: "DELETE",
         credentials: "include",
       });

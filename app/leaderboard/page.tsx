@@ -39,7 +39,7 @@ export default function LeaderboardPage() {
   }, []);
 
   useEffect(() => {
-    fetch(`/api/leaderboard?sortBy=${sortBy}`, {
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/leaderboard?sortBy=${sortBy}`, {
       credentials: "include",
     })
       .then((res) => res.json())
