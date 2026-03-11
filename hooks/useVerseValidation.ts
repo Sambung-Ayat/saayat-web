@@ -36,16 +36,19 @@ export function useVerseValidation(
 
     setIsValidating(true);
     try {
-      const res = await fetch("/api/quiz/validate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({
-          choiceKey: option.key,
-          challengeToken: question.challengeToken,
-          sessionLimit,
-        }),
-      });
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/quiz/validate`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({
+            choiceKey: option.key,
+            challengeToken: question.challengeToken,
+            sessionLimit,
+          }),
+        },
+      );
 
       if (!res.ok) throw new Error("Validation failed");
 
