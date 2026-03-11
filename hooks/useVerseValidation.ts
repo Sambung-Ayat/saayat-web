@@ -1,9 +1,24 @@
-import { useState } from 'react';
-import { Question, QuestionOption, ValidationResponse } from '../types/quran';
+import { useState } from "react";
+import { Question, QuestionOption } from "../types/quran";
 
-export function useVerseValidation(sessionLimit: number, playSound: (type: 'correct' | 'wrong' | 'completed') => void) {
+interface ValidateResponseData {
+  isCorrect: boolean;
+  comboStreak: number;
+  pointsGained: number;
+  totalPoints: number;
+  remainingQuestions: number;
+  currentCorrectStreak?: number;
+  correctAyah?: { text: string; surah: number; ayah: number };
+}
+
+export function useVerseValidation(
+  sessionLimit: number,
+  playSound: (type: "correct" | "wrong" | "completed") => void,
+) {
   const [isValidating, setIsValidating] = useState(false);
-  const [feedback, setFeedback] = useState<'correct' | 'incorrect' | null>(null);
+  const [feedback, setFeedback] = useState<"correct" | "incorrect" | null>(
+    null,
+  );
   const [correctAyah, setCorrectAyah] = useState<QuestionOption | null>(null);
   const [streak, setStreak] = useState<number>(0);
   const [combo, setCombo] = useState<number>(0);
@@ -11,7 +26,8 @@ export function useVerseValidation(sessionLimit: number, playSound: (type: 'corr
   const [maxStreak, setMaxStreak] = useState<number>(0);
   const [pointsGained, setPointsGained] = useState<number>(0);
   const [totalPoints, setTotalPoints] = useState<number>(0);
-  const [remainingQuestions, setRemainingQuestions] = useState<number>(sessionLimit);
+  const [remainingQuestions, setRemainingQuestions] =
+    useState<number>(sessionLimit);
   const [correctCount, setCorrectCount] = useState<number>(0);
   const [isSubmitted, setIsSubmitted] = useState(false);
 
@@ -20,53 +36,54 @@ export function useVerseValidation(sessionLimit: number, playSound: (type: 'corr
 
     setIsValidating(true);
     try {
-      const res = await fetch('/api/validate', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+      const res = await fetch("/api/quiz/validate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({
           choiceKey: option.key,
           challengeToken: question.challengeToken,
-          sessionLimit: sessionLimit,
+          sessionLimit,
         }),
       });
 
-      if (!res.ok) throw new Error('Validation failed');
+      if (!res.ok) throw new Error("Validation failed");
 
-      const data: ValidationResponse = await res.json();
+      const { data }: { data: ValidateResponseData } = await res.json();
 
-      setFeedback(data.isCorrect ? 'correct' : 'incorrect');
+      console.log("Validation response:", data);
+
+      setFeedback(data.isCorrect ? "correct" : "incorrect");
+
       if (data.isCorrect) {
-        setCorrectCount(prev => prev + 1);
-        setStreak(data.currentCorrectStreak ?? 0);
+        setCorrectCount((prev) => prev + 1);
         setCombo(data.comboStreak ?? 0);
         setPointsGained(data.pointsGained ?? 0);
-        setMaxStreak(prev => Math.max(prev, data.currentCorrectStreak ?? 0));
-        setMaxCombo(prev => Math.max(prev, data.comboStreak ?? 0));
-        playSound('correct');
+        setMaxCombo((prev) => Math.max(prev, data.comboStreak ?? 0));
+        playSound("correct");
       } else {
         setStreak(0);
         setCombo(0);
         setPointsGained(0);
-        playSound('wrong');
+        playSound("wrong");
       }
 
-      if (data.totalPoints !== undefined) setTotalPoints(data.totalPoints);
-      if (data.remainingQuestions !== undefined) setRemainingQuestions(data.remainingQuestions);
+      setTotalPoints(data.totalPoints ?? 0);
+      setRemainingQuestions(data.remainingQuestions ?? 0);
 
       if (data.correctAyah) {
         setCorrectAyah({
-          key: 'correct',
+          key: "correct",
           text: data.correctAyah.text,
           surah: data.correctAyah.surah,
-          ayah: data.correctAyah.ayah
+          ayah: data.correctAyah.ayah,
         } as any);
       }
+
       setIsSubmitted(true);
       return data;
     } catch (error) {
-      console.error('Validation error:', error);
+      console.error("Validation error:", error);
     } finally {
       setIsValidating(false);
     }
@@ -105,6 +122,6 @@ export function useVerseValidation(sessionLimit: number, playSound: (type: 'corr
     isSubmitted,
     validateAnswer,
     resetValidationState,
-    resetSessionStats
+    resetSessionStats,
   };
 }

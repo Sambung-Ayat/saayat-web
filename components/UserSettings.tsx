@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { createClient } from '@/lib/supabase/client';
-import { useRouter } from 'next/navigation';
-import { Edit, Trash2, X, Check, AlertTriangle } from 'lucide-react';
+import { useState, useEffect } from "react";
+import { authClient } from "@/lib/better-auth/client";
+import { useRouter } from "next/navigation";
+import { Edit, Trash2, X, Check, AlertTriangle } from "lucide-react";
 
 interface UserSettingsProps {
   user: { email?: string } | null;
@@ -12,26 +12,29 @@ interface UserSettingsProps {
 
 export default function UserSettings({ user, onClose }: UserSettingsProps) {
   const [isEditingName, setIsEditingName] = useState(false);
-  const [displayName, setDisplayName] = useState('');
-  const [originalName, setOriginalName] = useState('');
+  const [displayName, setDisplayName] = useState("");
+  const [originalName, setOriginalName] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const [deleteConfirmText, setDeleteConfirmText] = useState('');
+  const [deleteConfirmText, setDeleteConfirmText] = useState("");
   const router = useRouter();
-  const supabase = createClient();
 
   useEffect(() => {
     const run = async () => {
       try {
-        const response = await fetch('/api/user/current');
-        if (response.ok) {
-          const data = await response.json();
-          const currentName = data.displayName || data.email?.split('@')[0] || 'Hamba Allah';
+        const res = await fetch("/api/user/me", {
+          credentials: "include",
+        });
+
+        if (res.ok) {
+          const { data } = await res.json();
+          const currentName =
+            data.displayName || data.email?.split("@")[0] || "Hamba Allah";
           setDisplayName(currentName);
           setOriginalName(currentName);
         }
       } catch {
-        const fallbackName = user?.email?.split('@')[0] || 'Hamba Allah';
+        const fallbackName = user?.email?.split("@")[0] || "Hamba Allah";
         setDisplayName(fallbackName);
         setOriginalName(fallbackName);
       }
@@ -41,31 +44,30 @@ export default function UserSettings({ user, onClose }: UserSettingsProps) {
 
   const handleSaveDisplayName = async () => {
     if (!displayName.trim()) {
-      alert('Nama tidak boleh kosong');
+      alert("Nama tidak boleh kosong");
       return;
     }
 
     setIsLoading(true);
     try {
-      const response = await fetch('/api/user/display-name', {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+      const res = await fetch("/api/user/me", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({ displayName: displayName.trim() }),
       });
 
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || 'Gagal menyimpan nama');
+      if (!res.ok) {
+        const error = await res.json();
+        throw new Error(error.message || "Gagal menyimpan nama");
       }
 
       setOriginalName(displayName.trim());
       setIsEditingName(false);
       router.refresh();
     } catch (error) {
-      console.error('Error saving display name:', error);
-      alert(error instanceof Error ? error.message : 'Gagal menyimpan nama');
+      console.error("Error saving display name:", error);
+      alert(error instanceof Error ? error.message : "Gagal menyimpan nama");
     } finally {
       setIsLoading(false);
     }
@@ -77,33 +79,26 @@ export default function UserSettings({ user, onClose }: UserSettingsProps) {
   };
 
   const handleDeleteAccount = async () => {
-    if (deleteConfirmText !== 'HAPUS') {
+    if (deleteConfirmText !== "HAPUS") {
       alert('Silakan ketik "HAPUS" untuk konfirmasi');
       return;
     }
 
     setIsLoading(true);
     try {
-      const response = await fetch('/api/user/delete', {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+      const res = await fetch("/api/user/me", {
+        method: "DELETE",
+        credentials: "include",
       });
 
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || 'Gagal menghapus akun');
+      if (res.ok) {
+        await authClient.signOut();
+        router.push("/");
+        router.refresh();
       }
-
-      // Ensure client-side logout too (clears localStorage/session)
-      await supabase.auth.signOut();
-      // Redirect to home page after successful deletion
-      router.push('/');
-      router.refresh();
     } catch (error) {
-      console.error('Error deleting account:', error);
-      alert(error instanceof Error ? error.message : 'Gagal menghapus akun');
+      console.error("Error deleting account:", error);
+      alert(error instanceof Error ? error.message : "Gagal menghapus akun");
     } finally {
       setIsLoading(false);
     }
@@ -126,7 +121,9 @@ export default function UserSettings({ user, onClose }: UserSettingsProps) {
 
           {/* Display Name Section */}
           <div className="space-y-3">
-            <h3 className="text-sm font-medium text-muted-foreground">Nama Tampilan</h3>
+            <h3 className="text-sm font-medium text-muted-foreground">
+              Nama Tampilan
+            </h3>
             {!isEditingName ? (
               <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
                 <span className="font-medium">{originalName}</span>
@@ -170,7 +167,8 @@ export default function UserSettings({ user, onClose }: UserSettingsProps) {
               </div>
             )}
             <p className="text-xs text-muted-foreground">
-              Nama ini akan ditampilkan di leaderboard. Gunakan nama yang sopan dan tidak mengandung unsur negatif.
+              Nama ini akan ditampilkan di leaderboard. Gunakan nama yang sopan
+              dan tidak mengandung unsur negatif.
             </p>
           </div>
 
@@ -189,17 +187,18 @@ export default function UserSettings({ user, onClose }: UserSettingsProps) {
                 Hapus Akun
               </button>
             ) : (
-            <div className="space-y-4 p-4 bg-red-500/5 border border-red-500/20 rounded-lg">
+              <div className="space-y-4 p-4 bg-red-500/5 border border-red-500/20 rounded-lg">
                 <div className="flex items-center gap-2 text-red-500">
                   <AlertTriangle className="w-5 h-5" />
                   <span className="font-medium">Konfirmasi Penghapusan</span>
                 </div>
                 <p className="text-sm text-muted-foreground">
-                  Tindakan ini tidak dapat dibatalkan. Semua data Anda akan dihapus secara permanen.
+                  Tindakan ini tidak dapat dibatalkan. Semua data Anda akan
+                  dihapus secara permanen.
                 </p>
                 <div className="space-y-2">
                   <label className="text-sm font-medium">
-                  Ketik &quot;HAPUS&quot; untuk konfirmasi:
+                    Ketik &quot;HAPUS&quot; untuk konfirmasi:
                   </label>
                   <input
                     type="text"
@@ -213,15 +212,15 @@ export default function UserSettings({ user, onClose }: UserSettingsProps) {
                 <div className="flex gap-2">
                   <button
                     onClick={handleDeleteAccount}
-                    disabled={isLoading || deleteConfirmText !== 'HAPUS'}
+                    disabled={isLoading || deleteConfirmText !== "HAPUS"}
                     className="flex-1 px-3 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                   >
-                    {isLoading ? 'Menghapus...' : 'Hapus Akun'}
+                    {isLoading ? "Menghapus..." : "Hapus Akun"}
                   </button>
                   <button
                     onClick={() => {
                       setShowDeleteConfirm(false);
-                      setDeleteConfirmText('');
+                      setDeleteConfirmText("");
                     }}
                     disabled={isLoading}
                     className="flex-1 px-3 py-2 bg-muted text-foreground rounded-lg hover:bg-muted/80 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
