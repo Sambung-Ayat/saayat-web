@@ -1,15 +1,5 @@
 import { useState } from "react";
-import { Question, QuestionOption } from "../types/quran";
-
-interface ValidateResponseData {
-  isCorrect: boolean;
-  comboStreak: number;
-  pointsGained: number;
-  totalPoints: number;
-  remainingQuestions: number;
-  currentCorrectStreak?: number;
-  correctAyah?: { text: string; surah: number; ayah: number };
-}
+import { Question, QuestionOption, ValidationResponse } from "../types/quran";
 
 export function useVerseValidation(
   sessionLimit: number,
@@ -52,9 +42,7 @@ export function useVerseValidation(
 
       if (!res.ok) throw new Error("Validation failed");
 
-      const { data }: { data: ValidateResponseData } = await res.json();
-
-      console.log("Validation response:", data);
+      const { data }: { data: ValidationResponse } = await res.json();
 
       setFeedback(data.isCorrect ? "correct" : "incorrect");
 

@@ -22,6 +22,7 @@ import confetti from "canvas-confetti";
 import { useVerseValidation } from "@/hooks/useVerseValidation";
 import { DraggableOption } from "@/components/practice/DraggableOption";
 import { DropZone } from "@/components/practice/DropZone";
+import { authClient } from "@/lib/better-auth/client";
 import uiTexts from "@/i18n/practice.json";
 
 const uiText = uiTexts as Record<string, any>;
@@ -96,6 +97,25 @@ function PracticeContent() {
     disabled: false,
   });
 
+  const sessionInitialized = useRef(false);
+
+  useEffect(() => {
+    if (sessionInitialized.current) return; // ← prevent StrictMode double run
+    sessionInitialized.current = true;
+
+    const ensureSession = async () => {
+      const { data: session } = await authClient.getSession();
+      if (!session?.user) {
+        const { data } = await authClient.signIn.anonymous();
+        console.log("Anonymous session created:", data?.user?.id);
+      } else {
+        console.log("Existing session:", session.user.id);
+      }
+    };
+
+    ensureSession();
+  }, []);
+
   useEffect(() => {
     if (limitParam) {
       localStorage.setItem("questionLimit", limitParam);
@@ -140,18 +160,16 @@ function PracticeContent() {
     setActiveDragItem(null);
 
     try {
-      let url = `${process.env.NEXT_PUBLIC_API_URL}/quiz/question`;
       const params = new URLSearchParams();
       if (juzParam) params.append("juz", juzParam);
       if (surahParam) params.append("surah", surahParam);
       const lang = localStorage.getItem("app-language")?.toLowerCase() || "id";
       params.append("lang", lang);
 
-      if (params.toString()) {
-        url += `?${params.toString()}`;
-      }
-
-      const res = await fetch(url, { credentials: "include" });
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/quiz/question?${params.toString()}`,
+        { credentials: "include" },
+      );
       if (!res.ok) throw new Error("Failed to fetch question");
       const { data }: { data: Question } = await res.json();
       setQuestion(data);
@@ -303,13 +321,13 @@ function PracticeContent() {
             </button>
             <Link
               href="/leaderboard"
-              className="w-full py-4 bg-transparent border border-border text-foreground rounded-full text-lg font-medium hover:bg-muted/50 transition-all duration-300 cursor-pointer"
+              className="w-full py-4 bg-transparent border border-border text-foreground rounded-full text-lg font-medium hover:bg-muted/50 transition-all duration-300 cursor-pointer text-center"
             >
               {t.leaderboard}
             </Link>
             <Link
               href="/"
-              className="text-sm text-muted-foreground hover:text-foreground transition-colors py-2"
+              className="text-sm text-muted-foreground hover:text-foreground transition-colors py-2 text-center"
             >
               {t.home}
             </Link>

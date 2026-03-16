@@ -61,18 +61,12 @@ export interface ValidationRequest {
 
 export interface ValidationResponse {
   isCorrect: boolean;
-  currentStreak?: number;
-  longestStreak?: number;
+  comboStreak: number;
+  pointsGained: number;
+  totalPoints: number;
+  remainingQuestions: number;
   currentCorrectStreak?: number;
-  
-  comboStreak?: number;
-  pointsGained?: number;
-  totalPoints?: number;
-  remainingQuestions?: number;
-  sessionFinished?: boolean;
-
   correctAyah?: {
-    id: number;
     text: string;
     surah: number;
     ayah: number;
