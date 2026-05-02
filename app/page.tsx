@@ -656,7 +656,7 @@ export default function Home() {
             )}
           </div>
 
-          {/* Features Grid (Subtle) */}
+          {/* Features Grid (Subtle)
           {!showJuzSelection && !showSettings && (
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 pt-12 max-w-4xl mx-auto text-sm text-muted-foreground animate-in fade-in delay-200">
               <div className="group space-y-3 p-4 rounded-2xl hover:bg-card/50 transition-colors duration-300">
@@ -687,12 +687,12 @@ export default function Home() {
                 <p>{t.feature3Desc}</p>
               </div>
             </div>
-          )}
+          )} */}
         </div>
       </main>
 
       <footer className="py-8 text-center text-sm text-muted-foreground/60 relative z-10">
-        <div className="mt-16 px-4">
+        <div className="mt-4 px-4">
           <div className="max-w-2xl mx-auto p-6 rounded-3xl border border-border bg-muted/30 text-center">
             <p className="text-sm sm:text-base text-muted-foreground">
               Jika aplikasi ini bermanfaat dan ingin ikut menjaga server tetap
