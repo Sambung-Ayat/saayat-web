@@ -699,7 +699,7 @@ export default function Home() {
               hidup, kamu bisa support di sini 🤍
             </p>
             <a
-              href="https://saweria.co/dayeeen"
+              href="https://saweria.co/saayat"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center justify-center mt-5 px-6 py-3 rounded-full bg-primary text-primary-foreground font-medium hover:opacity-90 transition"
