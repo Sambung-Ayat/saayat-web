@@ -86,7 +86,7 @@ export default function DonationPopup() {
           {/* Body */}
           <div className="space-y-3 text-sm text-[var(--muted-foreground)] leading-relaxed">
             <p>
-              Assalamu'alaikum, Jazakumullah khairan telah menggunakan{" "}
+              Assalamu&apos;alaikum, Jazakumullah khairan telah menggunakan{" "}
               <span className="font-semibold text-[var(--foreground)]">Saayat</span>.
             </p>
             <p>

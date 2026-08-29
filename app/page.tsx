@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { ChevronDown, ChevronUp, X } from "lucide-react";
 
 interface Surah {
@@ -22,6 +23,12 @@ const uiText = {
     questionCount: "Jumlah Soal",
     questions: "Soal",
     autoplayAudio: "Autoplay Audio",
+    practiceMode: "Mode Latihan",
+    practiceModeDesc: "Pilih cara antum ingin menjawab ayat lanjutan",
+    practiceModeChoice: "Pilihan Ganda",
+    practiceModeChoiceDesc: "Jawab dengan drag and drop seperti sebelumnya",
+    practiceModeSpeech: "Speech Recognition",
+    practiceModeSpeechDesc: "Jawab dengan melafalkan kelanjutan ayat",
     allSurahs: "Semua Surah",
     close: "Tutup",
     juz: "Juz",
@@ -49,7 +56,9 @@ const uiText = {
     feature3Desc: "Tanpa iklan, desain minimalis. Hanya antum dan Al-Qur'an.",
     footer: "Dibuat dengan niat tulus.",
     beta: "Rilis Beta",
-    ver: "Versi 1.1.0",
+    ver: "Versi 1.1.1",
+    privacy: "Privacy Policy",
+    terms: "Terms of Service",
   },
   en: {
     title: "Connect",
@@ -62,6 +71,12 @@ const uiText = {
     questionCount: "Question Count",
     questions: "Questions",
     autoplayAudio: "Autoplay Audio",
+    practiceMode: "Practice Mode",
+    practiceModeDesc: "Choose how you want to answer the next verse",
+    practiceModeChoice: "Multiple Choice",
+    practiceModeChoiceDesc: "Answer using the existing drag and drop flow",
+    practiceModeSpeech: "Speech Recognition",
+    practiceModeSpeechDesc: "Answer by reciting the continuation aloud",
     allSurahs: "All Surahs",
     close: "Close",
     juz: "Juz",
@@ -88,7 +103,9 @@ const uiText = {
     feature3Desc: "No ads, minimalist design. Just you and the Qur'an.",
     footer: "Made with sincere intentions.",
     beta: "Beta Release",
-    ver: "Version 1.1.0",
+    ver: "Version 1.1.1",
+    privacy: "Privacy Policy",
+    terms: "Terms of Service",
   },
 };
 
@@ -271,18 +288,22 @@ export default function Home() {
   const fetchSurahs = async (juzs: number[]) => {
     setLoadingSurahs(true);
     try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/quiz/surahs?juz=${juzs.join(",")}`,
-        {
-          credentials: "include",
-        },
-      );
-      if (res.ok) {
-        const { data } = await res.json();
-        setSurahs(data);
+      const params = new URLSearchParams({
+        juz: juzs.join(","),
+      });
+      const res = await fetch(`/api/quiz/surahs?${params.toString()}`, {
+        cache: "no-store",
+      });
+
+      if (!res.ok) {
+        throw new Error(`Failed to fetch surahs: ${res.status}`);
       }
+
+      const { data } = await res.json();
+      setSurahs(data ?? []);
     } catch (error) {
       console.error("Failed to fetch surahs", error);
+      setSurahs([]);
     } finally {
       setLoadingSurahs(false);
     }
@@ -709,6 +730,20 @@ export default function Home() {
             <p className="text-sm text-muted-foreground mt-5">
               © {new Date().getFullYear()} Sambung Ayat. {t.footer}
             </p>
+            <div className="mt-4 flex flex-wrap items-center justify-center gap-4 text-sm">
+              <Link
+                href="/privacy"
+                className="hover:text-foreground transition-colors"
+              >
+                {t.privacy}
+              </Link>
+              <Link
+                href="/terms-of-service"
+                className="hover:text-foreground transition-colors"
+              >
+                {t.terms}
+              </Link>
+            </div>
           </div>
         </div>
       </footer>

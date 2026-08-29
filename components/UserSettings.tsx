@@ -40,7 +40,7 @@ export default function UserSettings({ user, onClose }: UserSettingsProps) {
       }
     };
     run();
-  }, []);
+  }, [user?.email]);
 
   const handleSaveDisplayName = async () => {
     if (!displayName.trim()) {
