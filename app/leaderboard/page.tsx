@@ -30,6 +30,8 @@ export default function LeaderboardPage() {
   const [loadedPeriod, setLoadedPeriod] = useState<Period | null>(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [checkingSession, setCheckingSession] = useState(true);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [retryTick, setRetryTick] = useState(0);
   const [locale] = useState<"id" | "en">(() => {
     if (typeof window === "undefined") return "id";
     const stored = localStorage.getItem("app-language")?.toLowerCase();
@@ -52,11 +54,32 @@ export default function LeaderboardPage() {
 
     fetch(`/api/leaderboard?${params.toString()}`, {
       credentials: "include",
+      headers: { Accept: "application/json" },
     })
-      .then((res) => res.json())
-      .then((res) => {
-        const data = res.data;
-        if (data?.topUsers) setUsers(data.topUsers);
+      .then(async (res) => {
+        const text = await res.text();
+        let json: unknown;
+        try {
+          json = JSON.parse(text);
+        } catch {
+          throw new Error(
+            `Invalid response (status ${res.status}): ${text.slice(0, 120)}`,
+          );
+        }
+        if (!res.ok) {
+          const err = (json as { error?: string })?.error || res.statusText;
+          throw new Error(`Server error ${res.status}: ${err}`);
+        }
+        const payload = json as {
+          data?: {
+            topUsers?: LeaderboardUser[];
+            currentUser?: CurrentUserRank | null;
+          };
+        };
+        const data = payload.data || (json as { topUsers?: LeaderboardUser[]; currentUser?: CurrentUserRank | null });
+        setErrorMsg(null);
+        if (Array.isArray(data?.topUsers)) setUsers(data.topUsers);
+        else setUsers([]);
         if (data?.currentUser) setCurrentUser(data.currentUser);
         else setCurrentUser(null);
         setLoadedSortBy(sortBy);
@@ -64,10 +87,13 @@ export default function LeaderboardPage() {
       })
       .catch((err) => {
         console.error("Failed to load leaderboard", err);
+        setErrorMsg(err instanceof Error ? err.message : "Unknown error");
+        setUsers([]);
+        setCurrentUser(null);
         setLoadedSortBy(sortBy);
         setLoadedPeriod(period);
       });
-  }, [sortBy, period]);
+  }, [sortBy, period, retryTick]);
 
   const weekStart = getWeekStart();
   const weekRangeText = formatWeekRange(weekStart, locale);
@@ -226,6 +252,31 @@ export default function LeaderboardPage() {
 
         {/* List */}
         <div className="bg-card border border-border rounded-3xl shadow-sm overflow-hidden">
+          {errorMsg && !loading && (
+            <div className="p-4 sm:p-6 text-center border-b border-border bg-red-500/5">
+              <div className="flex flex-col items-center gap-3">
+              <div className="text-sm font-medium text-red-600 dark:text-red-400 flex items-center gap-2">
+                <span>❌</span>
+                <span>
+                  {locale === "en" ? "Failed to load data" : "Gagal memuat data"}
+                </span>
+              </div>
+              <div className="text-xs text-muted-foreground max-w-md break-all font-mono bg-muted/50 px-3 py-2 rounded-lg">
+                {errorMsg}
+              </div>
+              <button
+                onClick={() => {
+                  setLoadedSortBy(null);
+                  setLoadedPeriod(null);
+                  setRetryTick((t) => t + 1);
+                }}
+                className="text-xs px-4 py-2 rounded-full bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
+              >
+                🔄 {locale === "en" ? "Retry" : "Coba Lagi"}
+              </button>
+            </div>
+            </div>
+          )}
           {loading ? (
             <div className="p-12 text-center text-muted-foreground animate-pulse">
               {t.loading}

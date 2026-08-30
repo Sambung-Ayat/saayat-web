@@ -1,46 +1,41 @@
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: NextRequest) {
-  const searchParams = req.nextUrl.searchParams;
-  const sortBy = searchParams.get("sortBy") || "points";
-
-  const url = new URL(`${process.env.NEXT_PUBLIC_API_URL}/leaderboard`);
-  url.searchParams.set("sortBy", sortBy);
+  const params = req.nextUrl.searchParams.toString();
+  const url = `${process.env.NEXT_PUBLIC_API_URL}/quiz/surahs${
+    params ? `?${params}` : ""
+  }`;
 
   try {
-    const res = await fetch(url.toString(), {
+    const res = await fetch(url, {
       method: "GET",
       headers: {
         Accept: "application/json",
         cookie: req.headers.get("cookie") || "",
       },
+      cache: "no-store",
     });
 
     const text = await res.text();
     let data: unknown;
-
     try {
       data = JSON.parse(text);
     } catch {
-      console.error("[leaderboard proxy] invalid JSON from upstream:", {
+      console.error("[quiz/surahs proxy] invalid JSON:", {
         status: res.status,
-        url: url.toString(),
-        bodyPreview: text.slice(0, 300),
+        preview: text.slice(0, 300),
       });
       return NextResponse.json(
-        {
-          error: "Upstream returned non-JSON response",
-          status: res.status,
-        },
+        { error: "Upstream returned non-JSON response", status: res.status },
         { status: 502 },
       );
     }
 
     return NextResponse.json(data, { status: res.status });
   } catch (err) {
-    console.error("[leaderboard proxy] fetch error:", err);
+    console.error("[quiz/surahs proxy] fetch error:", err);
     return NextResponse.json(
-      { error: "Failed to fetch leaderboard" },
+      { error: "Failed to fetch surahs" },
       { status: 500 },
     );
   }

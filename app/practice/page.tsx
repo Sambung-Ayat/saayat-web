@@ -167,8 +167,8 @@ function PracticeContent() {
       params.append("lang", lang);
 
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/quiz/question?${params.toString()}`,
-        { credentials: "include" },
+        `/api/quiz/question?${params.toString()}`,
+        { credentials: "include", headers: { Accept: "application/json" } },
       );
       if (!res.ok) throw new Error("Failed to fetch question");
       const { data }: { data: Question } = await res.json();
