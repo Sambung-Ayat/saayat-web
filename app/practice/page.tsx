@@ -333,7 +333,7 @@ function PracticeContent() {
               }}
               className="w-full py-4 bg-primary text-primary-foreground rounded-full text-lg font-medium shadow-lg shadow-primary/25 hover:shadow-xl hover:-translate-y-1 hover:bg-primary/90 transition-all duration-300 cursor-pointer flex items-center justify-center gap-2"
             >
-              <SvgIcon name="quran" size={20} className="-scale-x-100" />
+              {/* <SvgIcon name="quran-icon" size={20} className="-scale-x-100" /> */}
               {t.newSession}
             </button>
             <Link
