@@ -25,7 +25,6 @@ const sections = [
     title: "Penyimpanan dan Keamanan",
     content: [
       "Data akun dan progres disimpan pada layanan backend yang kami gunakan untuk menjalankan SaAyat. Kami berupaya menjaga data tetap aman dengan praktik keamanan yang wajar, tetapi tidak ada sistem yang bisa dijamin 100% bebas risiko.",
-      "Jika antum menggunakan mode speech recognition, proses pengenalan suara mengikuti kemampuan browser/perangkat yang antum gunakan. Audio dapat diproses oleh fitur speech recognition bawaan browser dan tidak kami simpan sebagai rekaman di aplikasi ini.",
     ],
   },
   {
@@ -43,7 +42,7 @@ export default function PrivacyPage() {
       eyebrow="Privacy Policy"
       title="Kebijakan Privasi"
       description="Halaman ini menjelaskan bagaimana SaAyat mengumpulkan, menggunakan, dan menjaga data yang diperlukan untuk menghadirkan pengalaman latihan hafalan yang konsisten."
-      updatedAt="29 Agustus 2026"
+      updatedAt="30 Agustus 2026"
       sections={[...sections]}
     />
   );

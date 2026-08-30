@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { ChevronDown, ChevronUp, X } from "lucide-react";
+import { SvgIcon } from "@/components/SvgIcon";
 
 interface Surah {
   id: number;
@@ -56,7 +57,7 @@ const uiText = {
     feature3Desc: "Tanpa iklan, desain minimalis. Hanya antum dan Al-Qur'an.",
     footer: "Dibuat dengan niat tulus.",
     beta: "Rilis Beta",
-    ver: "Versi 1.1.1",
+    ver: "Versi 1.1.2",
     privacy: "Privacy Policy",
     terms: "Terms of Service",
   },
@@ -103,7 +104,7 @@ const uiText = {
     feature3Desc: "No ads, minimalist design. Just you and the Qur'an.",
     footer: "Made with sincere intentions.",
     beta: "Beta Release",
-    ver: "Version 1.1.1",
+    ver: "Version 1.1.2",
     privacy: "Privacy Policy",
     terms: "Terms of Service",
   },
@@ -335,8 +336,9 @@ export default function Home() {
             <Bismillah />
 
             <div className="space-y-2">
-              <div className="inline-flex items-center justify-center px-4 py-1.5 rounded-full bg-muted text-muted-foreground text-xs sm:text-sm font-medium tracking-wide mb-4">
-                ✨ {t.ver}
+              <div className="inline-flex items-center justify-center px-4 py-1.5 rounded-full bg-muted text-muted-foreground text-xs sm:text-sm font-medium tracking-wide mb-4 gap-1.5">
+                <SvgIcon name="sparkles" size={14} />
+                {t.ver}
               </div>
               <h1 className="text-4xl sm:text-7xl font-bold tracking-tight text-foreground font-arabic leading-tight">
                 {t.title}{" "}

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { authClient } from "@/lib/better-auth/client";
 import { getWeekStart, formatWeekRange } from "@/lib/week-utils";
+import { SvgIcon } from "@/components/SvgIcon";
 
 interface LeaderboardUser {
   id: string;
@@ -158,8 +159,9 @@ export default function LeaderboardPage() {
           <p className="text-muted-foreground">{t.subtitle}</p>
 
           {!checkingSession && !isLoggedIn && (
-            <div className="bg-amber-500/10 border border-amber-500/20 rounded-xl p-4 text-center text-sm text-amber-600 dark:text-amber-400 animate-in fade-in slide-in-from-top-2">
-              ⚠️ {t.guestWarning}
+            <div className="bg-amber-500/10 border border-amber-500/20 rounded-xl p-4 text-center text-sm text-amber-600 dark:text-amber-400 animate-in fade-in slide-in-from-top-2 flex items-center justify-center gap-2">
+              <SvgIcon name="fire" size={16} className="opacity-70" />
+              <span>{t.guestWarning}</span>
             </div>
           )}
 
@@ -168,7 +170,7 @@ export default function LeaderboardPage() {
             <div className="inline-flex rounded-full bg-muted p-1 flex-col sm:flex-row gap-1">
               <button
                 onClick={() => setPeriod("alltime")}
-                className={`px-4 md:px-6 py-2 rounded-full text-xs md:text-sm font-medium transition-all duration-200
+                className={`px-4 md:px-6 py-2 rounded-full text-xs md:text-sm font-medium transition-all duration-200 flex items-center justify-center gap-1.5
                   ${
                     period === "alltime"
                       ? "bg-background text-foreground shadow-sm"
@@ -176,12 +178,13 @@ export default function LeaderboardPage() {
                   }
                 `}
               >
-                🏆 {t.alltime}
+                <SvgIcon name="star" size={16} />
+                {t.alltime}
               </button>
               <div className="relative">
                 <button
                   onClick={() => setPeriod("weekly")}
-                  className={`px-4 md:px-6 py-2 rounded-full text-xs md:text-sm font-medium transition-all duration-200 w-full
+                  className={`px-4 md:px-6 py-2 rounded-full text-xs md:text-sm font-medium transition-all duration-200 w-full flex items-center justify-center gap-1.5
                     ${
                       period === "weekly"
                         ? "bg-gradient-to-r from-purple-500/20 via-pink-500/20 to-amber-500/20 text-foreground shadow-sm ring-1 ring-foreground/10"
@@ -189,7 +192,8 @@ export default function LeaderboardPage() {
                     }
                   `}
                 >
-                  ⚡ {t.weekly}
+                  <SvgIcon name="sparkles" size={16} />
+                  {t.weekly}
                 </button>
               </div>
             </div>
@@ -198,11 +202,12 @@ export default function LeaderboardPage() {
           {period === "weekly" && (
             <div className="flex flex-col items-center gap-1 mt-3 animate-in fade-in slide-in-from-top-2">
               <div className="text-sm font-medium text-foreground/80 flex items-center gap-2">
-                <span className="text-lg">📅</span>
+                <SvgIcon name="calendar" size={16} />
                 <span>{weekRangeText}</span>
               </div>
-              <div className="text-[11px] text-muted-foreground uppercase tracking-wider">
-                🔄 {t.resetInfo}
+              <div className="text-[11px] text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
+                <SvgIcon name="calendar-repeat" size={14} />
+                {t.resetInfo}
               </div>
             </div>
           )}
@@ -212,7 +217,7 @@ export default function LeaderboardPage() {
             <div className="inline-flex rounded-full bg-muted p-1">
               <button
                 onClick={() => setSortBy("points")}
-                className={`px-4 md:px-6 py-2 rounded-full text-xs md:text-sm font-medium transition-all duration-200
+                className={`px-4 md:px-6 py-2 rounded-full text-xs md:text-sm font-medium transition-all duration-200 flex items-center justify-center gap-1.5
                   ${
                     sortBy === "points"
                       ? "bg-background text-foreground shadow-sm"
@@ -220,11 +225,12 @@ export default function LeaderboardPage() {
                   }
                 `}
               >
-                🌟 {t.points}
+                <SvgIcon name="star" size={16} />
+                {t.points}
               </button>
               <button
                 onClick={() => setSortBy("daily")}
-                className={`px-4 md:px-6 py-2 rounded-full text-xs md:text-sm font-medium transition-all duration-200
+                className={`px-4 md:px-6 py-2 rounded-full text-xs md:text-sm font-medium transition-all duration-200 flex items-center justify-center gap-1.5
                   ${
                     sortBy === "daily"
                       ? "bg-background text-foreground shadow-sm"
@@ -232,11 +238,12 @@ export default function LeaderboardPage() {
                   }
                 `}
               >
-                🔥 {t.daily}
+                <SvgIcon name="fire" size={16} />
+                {t.daily}
               </button>
               <button
                 onClick={() => setSortBy("correct")}
-                className={`px-4 md:px-6 py-2 rounded-full text-xs md:text-sm font-medium transition-all duration-200
+                className={`px-4 md:px-6 py-2 rounded-full text-xs md:text-sm font-medium transition-all duration-200 flex items-center justify-center gap-1.5
                   ${
                     sortBy === "correct"
                       ? "bg-background text-foreground shadow-sm"
@@ -244,7 +251,8 @@ export default function LeaderboardPage() {
                   }
                 `}
               >
-                ✅ {t.correct}
+                <SvgIcon name="check-circle" size={16} />
+                {t.correct}
               </button>
             </div>
           </div>
@@ -256,7 +264,10 @@ export default function LeaderboardPage() {
             <div className="p-4 sm:p-6 text-center border-b border-border bg-red-500/5">
               <div className="flex flex-col items-center gap-3">
               <div className="text-sm font-medium text-red-600 dark:text-red-400 flex items-center gap-2">
-                <span>❌</span>
+                <span className="relative flex items-center justify-center w-5 h-5 rounded-full bg-red-500/15">
+                  <span className="absolute w-0.5 h-3 bg-red-500 rotate-45" />
+                  <span className="absolute w-0.5 h-3 bg-red-500 -rotate-45" />
+                </span>
                 <span>
                   {locale === "en" ? "Failed to load data" : "Gagal memuat data"}
                 </span>
@@ -270,9 +281,10 @@ export default function LeaderboardPage() {
                   setLoadedPeriod(null);
                   setRetryTick((t) => t + 1);
                 }}
-                className="text-xs px-4 py-2 rounded-full bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
+                className="text-xs px-4 py-2 rounded-full bg-primary/10 text-primary hover:bg-primary/20 transition-colors flex items-center gap-1.5"
               >
-                🔄 {locale === "en" ? "Retry" : "Coba Lagi"}
+                <SvgIcon name="calendar-repeat" size={14} className="-scale-x-100" />
+                {locale === "en" ? "Retry" : "Coba Lagi"}
               </button>
             </div>
             </div>
@@ -333,22 +345,31 @@ export default function LeaderboardPage() {
                     <div className="col-span-6 sm:col-span-6 font-medium truncate flex items-center gap-2 text-sm sm:text-base">
                       {user.displayName || "Hamba Allah"}
                       {isTop1 && (
-                        <span className="text-amber-500 text-xs sm:text-sm animate-bounce">
-                          👑
-                        </span>
+                        <SvgIcon name="crown" size={20} className="animate-bounce" />
                       )}
                     </div>
 
                     {/* Streak / Points */}
                     <div className="col-span-2 sm:col-span-2 text-center font-mono text-xs sm:text-sm">
                       <span
-                        className={`font-bold ${sortBy === "points" ? "text-emerald-500" : "text-orange-500"}`}
+                        className={`font-bold inline-flex items-center gap-1 ${sortBy === "points" ? "text-emerald-500" : "text-orange-500"}`}
                       >
-                        {sortBy === "points"
-                          ? `🌟 ${user.totalPoints || 0}`
-                          : sortBy === "daily"
-                            ? `🔥 ${user.longestStreak}`
-                            : `🔥 ${user.longestCorrectStreak}`}
+                        {sortBy === "points" ? (
+                          <>
+                            <SvgIcon name="star" size={14} />
+                            {user.totalPoints || 0}
+                          </>
+                        ) : sortBy === "daily" ? (
+                          <>
+                            <SvgIcon name="fire" size={14} />
+                            {user.longestStreak}
+                          </>
+                        ) : (
+                          <>
+                            <SvgIcon name="fire" size={14} />
+                            {user.longestCorrectStreak}
+                          </>
+                        )}
                       </span>
                       <div className="text-[9px] sm:text-[10px] text-muted-foreground uppercase tracking-wider mt-1 hidden sm:block">
                         {sortBy === "points"
@@ -395,13 +416,24 @@ export default function LeaderboardPage() {
               {/* Streak / Points */}
               <div className="col-span-2 sm:col-span-2 text-center font-mono text-sm">
                 <span
-                  className={`font-bold ${sortBy === "points" ? "text-emerald-500" : "text-orange-500"}`}
+                  className={`font-bold inline-flex items-center gap-1 ${sortBy === "points" ? "text-emerald-500" : "text-orange-500"}`}
                 >
-                  {sortBy === "points"
-                    ? `🌟 ${currentUser.totalPoints || 0}`
-                    : sortBy === "daily"
-                      ? `🔥 ${currentUser.longestStreak}`
-                      : `🔥 ${currentUser.longestCorrectStreak}`}
+                  {sortBy === "points" ? (
+                    <>
+                      <SvgIcon name="star" size={16} />
+                      {currentUser.totalPoints || 0}
+                    </>
+                  ) : sortBy === "daily" ? (
+                    <>
+                      <SvgIcon name="fire" size={16} />
+                      {currentUser.longestStreak}
+                    </>
+                  ) : (
+                    <>
+                      <SvgIcon name="fire" size={16} />
+                      {currentUser.longestCorrectStreak}
+                    </>
+                  )}
                 </span>
               </div>
 
@@ -414,7 +446,8 @@ export default function LeaderboardPage() {
         )}
 
         <div className="text-center">
-          <Link href="/" className="text-primary hover:underline text-sm">
+          <Link href="/" className="text-primary hover:underline text-sm inline-flex items-center gap-1.5">
+            <SvgIcon name="chevron-right" size={16} className="-scale-x-100" />
             {t.back}
           </Link>
         </div>

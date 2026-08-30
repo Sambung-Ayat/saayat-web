@@ -1,0 +1,45 @@
+.sd-spinner {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sd-gap, 6px);
+}
+
+.sd-dot {
+  width: var(--sd-dot-size, 14px);
+  height: var(--sd-dot-size, 14px);
+  background: var(--sd-color, currentColor);
+  border-radius: 9999px;
+  animation: sd-expand-alt 1.8s ease-in-out infinite;
+  transform-origin: center;
+}
+
+.sd-dot-1 {
+  animation-delay: -1.125s;
+}
+.sd-dot-2 {
+  animation-delay: -0.675s;
+}
+.sd-dot-3 {
+  animation-delay: -0.225s;
+}
+
+@keyframes sd-expand-alt {
+  0%,
+  100% {
+    transform: scaleY(1);
+    opacity: 1;
+  }
+  25% {
+    transform: scaleY(3.2);
+    opacity: 0.85;
+  }
+  50% {
+    transform: scaleY(1);
+    opacity: 1;
+  }
+  75% {
+    transform: scaleY(3.2);
+    opacity: 0.85;
+  }
+}

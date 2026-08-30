@@ -33,7 +33,7 @@ const sections = [
     title: "Batasan Tanggung Jawab",
     content: [
       "Kami berupaya menjaga layanan tetap tersedia dan akurat, namun SaAyat disediakan sebagaimana adanya. Kami tidak menjamin layanan akan selalu bebas gangguan, sepenuhnya tanpa kesalahan, atau cocok untuk setiap kebutuhan khusus.",
-      "Dengan menggunakan layanan ini, antum memahami bahwa hasil latihan, skor, dan keluaran speech recognition dapat dipengaruhi koneksi, browser, perangkat, atau layanan pihak ketiga yang digunakan.",
+      "Dengan menggunakan layanan ini, antum memahami bahwa hasil latihan, skor, dan progres hafalan dapat dipengaruhi oleh koneksi internet, browser, perangkat, atau layanan pihak ketiga yang digunakan.",
     ],
   },
 ] as const;
@@ -44,7 +44,7 @@ export default function TermsOfServicePage() {
       eyebrow="Terms of Service"
       title="Syarat Layanan"
       description="Dokumen ini merangkum aturan penggunaan SaAyat agar layanan bisa terus dipakai dengan baik, adil, dan sesuai tujuan utamanya sebagai sarana latihan hafalan."
-      updatedAt="29 Agustus 2026"
+      updatedAt="30 Agustus 2026"
       sections={[...sections]}
     />
   );

@@ -20,9 +20,11 @@ export function useVerseValidation(
     useState<number>(sessionLimit);
   const [correctCount, setCorrectCount] = useState<number>(0);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [answeredQuestions, setAnsweredQuestions] = useState<number>(0);
 
   const validateAnswer = async (option: QuestionOption, question: Question) => {
     if (!option || !question) return;
+    if (isSubmitted || isValidating) return;
 
     setIsValidating(true);
     try {
@@ -44,6 +46,7 @@ export function useVerseValidation(
 
       const { data }: { data: ValidationResponse } = await res.json();
 
+      setAnsweredQuestions((n) => n + 1);
       setFeedback(data.isCorrect ? "correct" : "incorrect");
 
       if (data.isCorrect) {
@@ -61,7 +64,15 @@ export function useVerseValidation(
       }
 
       setTotalPoints(data.totalPoints ?? 0);
-      setRemainingQuestions(data.remainingQuestions ?? 0);
+      const remainingLocal = Math.max(
+        0,
+        sessionLimit - (answeredQuestions + 1),
+      );
+      setRemainingQuestions(
+        typeof data.remainingQuestions === "number"
+          ? data.remainingQuestions
+          : remainingLocal,
+      );
 
       if (data.correctAyah) {
         setCorrectAyah({
@@ -95,6 +106,7 @@ export function useVerseValidation(
     setPointsGained(0);
     setTotalPoints(0);
     setCorrectCount(0);
+    setAnsweredQuestions(0);
     setRemainingQuestions(limit);
     resetValidationState();
   };
@@ -112,6 +124,7 @@ export function useVerseValidation(
     remainingQuestions,
     correctCount,
     isSubmitted,
+    answeredQuestions,
     validateAnswer,
     resetValidationState,
     resetSessionStats,

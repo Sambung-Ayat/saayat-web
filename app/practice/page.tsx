@@ -24,6 +24,8 @@ import { DraggableOption } from "@/components/practice/DraggableOption";
 import { DropZone } from "@/components/practice/DropZone";
 import { authClient } from "@/lib/better-auth/client";
 import uiTexts from "@/i18n/practice.json";
+import { SvgIcon } from "@/components/SvgIcon";
+import { SpinnerThreeDots } from "@/components/SpinnerThreeDots";
 
 const uiText = uiTexts as Record<string, any>;
 
@@ -82,13 +84,15 @@ function PracticeContent() {
     maxStreak,
     pointsGained,
     totalPoints,
-    remainingQuestions,
     correctCount,
     isSubmitted,
+    answeredQuestions,
     validateAnswer,
     resetValidationState,
     resetSessionStats,
   } = useVerseValidation(sessionLimit, playSound);
+
+  const isLastQuestion = answeredQuestions >= sessionLimit;
 
   const [sessionFinished, setSessionFinished] = useState(false);
 
@@ -259,7 +263,9 @@ function PracticeContent() {
       <div className="min-h-screen flex flex-col items-center justify-start bg-background text-foreground p-6 pt-32 overflow-y-auto">
         <div className="text-center space-y-8 animate-in zoom-in duration-500 max-w-md w-full my-auto">
           <div className="space-y-2">
-            <div className="text-6xl mb-4 animate-bounce">🎉</div>
+            <div className="flex justify-center mb-4 animate-bounce">
+              <SvgIcon name="sparkles" size={64} className="drop-shadow" />
+            </div>
             <h1 className="text-4xl font-bold text-primary">
               {t.sessionFinished}
             </h1>
@@ -270,7 +276,8 @@ function PracticeContent() {
 
           <div className="p-8 bg-card border border-border rounded-3xl shadow-xl space-y-6">
             <div className="flex flex-col items-center space-y-2">
-              <span className="text-sm text-muted-foreground uppercase tracking-wider">
+              <span className="text-sm text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
+                <SvgIcon name="star" size={16} />
                 {t.totalPoints}
               </span>
               <span className="text-5xl font-bold text-emerald-500 font-mono">
@@ -280,6 +287,9 @@ function PracticeContent() {
             <div className="w-full h-px bg-border/50" />
             <div className="grid grid-cols-2 gap-4 text-center">
               <div className="p-4 rounded-2xl bg-muted/30">
+                <div className="flex justify-center mb-1">
+                  <SvgIcon name="fire" size={22} />
+                </div>
                 <div className="text-2xl font-bold text-foreground">
                   {maxStreak}
                 </div>
@@ -288,6 +298,9 @@ function PracticeContent() {
                 </div>
               </div>
               <div className="p-4 rounded-2xl bg-muted/30">
+                <div className="flex justify-center mb-1">
+                  <SvgIcon name="sparkles" size={22} />
+                </div>
                 <div className="text-2xl font-bold text-foreground">
                   {maxCombo}
                 </div>
@@ -297,6 +310,9 @@ function PracticeContent() {
               </div>
             </div>
             <div className="p-4 rounded-2xl bg-muted/30 text-center">
+              <div className="flex justify-center mb-1">
+                <SvgIcon name="check-circle" size={22} />
+              </div>
               <div className="text-2xl font-bold text-foreground">
                 {correctCount}
               </div>
@@ -315,20 +331,23 @@ function PracticeContent() {
                 setIsStarting(true);
                 fetchQuestion();
               }}
-              className="w-full py-4 bg-primary text-primary-foreground rounded-full text-lg font-medium shadow-lg shadow-primary/25 hover:shadow-xl hover:-translate-y-1 hover:bg-primary/90 transition-all duration-300 cursor-pointer"
+              className="w-full py-4 bg-primary text-primary-foreground rounded-full text-lg font-medium shadow-lg shadow-primary/25 hover:shadow-xl hover:-translate-y-1 hover:bg-primary/90 transition-all duration-300 cursor-pointer flex items-center justify-center gap-2"
             >
+              <SvgIcon name="quran" size={20} className="-scale-x-100" />
               {t.newSession}
             </button>
             <Link
               href="/leaderboard"
-              className="w-full py-4 bg-transparent border border-border text-foreground rounded-full text-lg font-medium hover:bg-muted/50 transition-all duration-300 cursor-pointer text-center"
+              className="w-full py-4 bg-transparent border border-border text-foreground rounded-full text-lg font-medium hover:bg-muted/50 transition-all duration-300 cursor-pointer text-center flex items-center justify-center gap-2"
             >
+              <SvgIcon name="crown" size={22} />
               {t.leaderboard}
             </Link>
             <Link
               href="/"
-              className="text-sm text-muted-foreground hover:text-foreground transition-colors py-2 text-center"
+              className="text-sm text-muted-foreground hover:text-foreground transition-colors py-2 text-center flex items-center justify-center gap-2"
             >
+              <SvgIcon name="chevron-right" size={16} className="-scale-x-100" />
               {t.home}
             </Link>
           </div>
@@ -366,8 +385,8 @@ function PracticeContent() {
               <span>
                 {t.question}{" "}
                 {isSubmitted
-                  ? sessionLimit - remainingQuestions
-                  : sessionLimit - remainingQuestions + 1}{" "}
+                  ? answeredQuestions
+                  : answeredQuestions + 1}{" "}
                 / {sessionLimit}
               </span>
               <span className="text-primary">
@@ -391,10 +410,14 @@ function PracticeContent() {
                 <div className="flex justify-center mt-2">
                   <button
                     onClick={toggleAudio}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-full transition-colors text-sm font-medium whitespace-nowrap leading-none ${isPlaying ? "bg-red-500 hover:bg-red-600 text-white" : "bg-primary hover:bg-primary/10 text-white"}`}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-full transition-all text-sm font-medium whitespace-nowrap leading-none shadow-md hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 ${isPlaying ? "bg-red-500 hover:bg-red-600 text-white" : "bg-primary hover:bg-primary/90 text-primary-foreground"}`}
                   >
+                    {isPlaying ? (
+                      <SvgIcon name="pause-circle" size={20} />
+                    ) : (
+                      <SvgIcon name="play-circle" size={20} />
+                    )}
                     <span>{isPlaying ? t.stop : t.play}</span>
-                    <span className="text-lg">{isPlaying ? "⏹️" : "▶️"}</span>
                   </button>
                   <audio
                     ref={audioRef}
@@ -433,7 +456,12 @@ function PracticeContent() {
               className={`w-full py-4 rounded-full text-lg font-medium tracking-wide transition-all duration-300 flex items-center justify-center gap-2 ${isValidating ? "bg-muted text-muted-foreground cursor-not-allowed opacity-80" : "bg-foreground text-background hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 cursor-pointer hover:bg-foreground/90"}`}
             >
               {isValidating && (
-                <div className="w-5 h-5 border-2 border-muted-foreground border-t-transparent rounded-full animate-spin" />
+                <SpinnerThreeDots
+                  size={30}
+                  dotSize={7}
+                  gap={3}
+                  className="text-muted-foreground"
+                />
               )}
               {isValidating ? "Checking..." : t.confirm}
             </button>
@@ -461,7 +489,11 @@ function PracticeContent() {
               <div className="w-full space-y-6 animate-in slide-in-from-bottom-4 fade-in duration-500">
                 {feedback === "incorrect" && correctAyah && (
                   <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/20 text-center space-y-2">
-                    <p className="text-amber-600 dark:text-amber-400 font-medium">
+                    <p className="text-amber-600 dark:text-amber-400 font-medium flex items-center justify-center gap-2">
+                      <span className="relative flex items-center justify-center w-5 h-5 rounded-full bg-amber-500/20">
+                        <span className="absolute w-0.5 h-3 bg-amber-500 rotate-45" />
+                        <span className="absolute w-0.5 h-3 bg-amber-500 -rotate-45" />
+                      </span>
                       {t.incorrect}
                     </p>
                     <p className="font-arabic text-xl text-foreground dir-rtl">
@@ -471,14 +503,18 @@ function PracticeContent() {
                 )}
                 {feedback === "correct" && (
                   <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-center animate-in zoom-in-95 duration-500 space-y-4">
-                    <p className="text-emerald-600 dark:text-emerald-400 font-semibold tracking-wide text-lg">
+                    <p className="text-emerald-600 dark:text-emerald-400 font-semibold tracking-wide text-lg flex items-center justify-center gap-2">
+                      <SvgIcon name="check-circle" size={24} />
                       {t.correct}
                     </p>
                     <div className="flex justify-center items-center gap-6">
                       <div className="flex flex-col items-center animate-in fade-in slide-in-from-bottom-2 delay-100">
-                        <span className="text-3xl font-bold text-emerald-500 font-mono">
-                          +{pointsGained}
-                        </span>
+                        <div className="flex items-center gap-1 text-emerald-500">
+                          <SvgIcon name="sparkles" size={20} />
+                          <span className="text-3xl font-bold font-mono">
+                            +{pointsGained}
+                          </span>
+                        </div>
                         <span className="text-[10px] uppercase tracking-wider text-emerald-600/70 font-bold mt-1">
                           {t.pointsLabel}
                         </span>
@@ -487,7 +523,10 @@ function PracticeContent() {
                         <div
                           className={`flex flex-col items-center animate-in fade-in zoom-in delay-200 ${combo >= 3 ? "scale-110" : ""}`}
                         >
-                          <span className="text-3xl">🔥 x{combo}</span>
+                          <div className="flex items-center gap-1 text-orange-500">
+                            <SvgIcon name="fire" size={24} />
+                            <span className="text-3xl font-bold">x{combo}</span>
+                          </div>
                           <span className="text-[10px] uppercase tracking-wider text-orange-500/70 font-bold mt-1">
                             {t.comboLabel}
                           </span>
@@ -498,7 +537,7 @@ function PracticeContent() {
                 )}
                 <button
                   onClick={() => {
-                    if (remainingQuestions <= 0) {
+                    if (isLastQuestion) {
                       setSessionFinished(true);
                       playSound("completed");
                       confetti({
@@ -513,7 +552,7 @@ function PracticeContent() {
                   }}
                   className="w-full py-4 bg-foreground text-background rounded-full text-lg font-medium tracking-wide shadow-lg hover:shadow-xl hover:-translate-y-0.5 active:translate-y-0 hover:bg-foreground/90 transition-all duration-300 cursor-pointer"
                 >
-                  {remainingQuestions <= 0 ? t.finish : t.next}
+                  {isLastQuestion ? t.finish : t.next}
                 </button>
               </div>
             )}
